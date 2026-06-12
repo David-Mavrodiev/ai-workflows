@@ -1,0 +1,49 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema",
+  "_comment": "Canonical, tool-agnostic source of truth for MCP servers. install.ps1 translates these into VS Code (user mcp.json) and Copilot CLI (~/.copilot/mcp-config.json) formats. 'kind' is 'stdio' or 'http'. 'targets' selects which tools receive the server. Secret values use ${input:ID} (VS Code prompts; CLI resolves from environment/.env at install time) or ${env:NAME}. The token ${repoRoot} (in stdio command/args/env) is replaced with this repo's absolute path at install time so local servers stay portable across machines.",
+  "inputs": [
+    {
+      "id": "github_token",
+      "type": "promptString",
+      "description": "GitHub Personal Access Token for the GitHub MCP server",
+      "password": true,
+      "envVar": "GITHUB_TOKEN"
+    }
+  ],
+  "servers": {
+    "sequential-thinking": {
+      "kind": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequentialthinking"],
+      "targets": ["vscode", "cli"]
+    },
+    "github": {
+      "kind": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${input:github_token}"
+      },
+      "targets": ["vscode", "cli"]
+    },
+    "brain-mcp": {
+      "kind": "stdio",
+      "_comment": "Local-only. Wraps the Memories app (mcp/memories) over stdio. The app must be running on port 3466 (see mcp/memories/start-server.ps1); memories persist as files under mcp/memories/memories-storage so they can be committed.",
+      "command": "node",
+      "args": ["${repoRoot}/mcp/memories/mcp-server/build/index.js"],
+      "env": {
+        "MEMORIES_API_BASE_URL": "http://localhost:3466/api"
+      },
+      "targets": ["vscode", "cli"]
+    },
+    "spec-workflow": {
+      "kind": "stdio",
+      "_comment": "Local-only, brain-mcp-backed. Drives spec-driven development: interview-based spec generation and per-spec task state. Specs are stored as linked notes in the 'Tasks & Specs' section of brain-mcp.",
+      "command": "node",
+      "args": ["${repoRoot}/mcp/spec-workflow/mcp-server/build/index.js"],
+      "env": {
+        "MEMORIES_API_BASE_URL": "http://localhost:3466/api"
+      },
+      "targets": ["vscode", "cli"]
+    }
+  }
+}

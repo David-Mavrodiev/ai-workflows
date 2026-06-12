@@ -1,0 +1,28 @@
+{
+  "name": "memories-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server that wraps the Memories REST API (stdio transport)",
+  "type": "module",
+  "bin": {
+    "memories-mcp": "build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', 0o755)\"",
+    "watch": "tsc --watch",
+    "start": "node build/index.js",
+    "test": "node smoke-test.mjs",
+    "test:e2e": "node e2e-test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.0"
+  }
+}

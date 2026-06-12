@@ -1,0 +1,11 @@
+# Node
+node_modules/
+build/
+npm-debug.log*
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Local spec storage (when SPECS_DIR points inside the repo for testing)
+specs/

@@ -1,0 +1,21 @@
+{
+  "name": "memories",
+  "version": "1.0.0",
+  "description": "A developer-focused memory-keeping application",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "nanoid": "^5.0.9",
+    "marked": "^15.0.0",
+    "mermaid": "^11.4.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.1.0",
+    "supertest": "^7.0.0"
+  }
+}
