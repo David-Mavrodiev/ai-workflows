@@ -88,8 +88,18 @@ When you have enough to write a first draft:
    returns the generated `id` (GUID) and seeds `metadata.json` (state `draft`,
    phase `requirement`). Use that id for everything below.
 3. Show the user the draft spec and refine it with `save_spec` until they're
-   happy. When they confirm scope, set the requirement gate:
-   `update_metadata({ id, gates: { requirement: true }, state: "specifying" })`.
+   happy.
+
+### Step 2.5 — Clarify the risky parts
+
+Before setting the requirement gate, do a focused clarify pass on the **hard,
+underspecified** parts — the places where a wrong assumption would be expensive.
+Ask 2–3 pointed questions (not a re-interview), fold the answers into `spec.md`'s
+Acceptance criteria / Open questions, and only then confirm scope. This is the
+cheapest place to catch "we built the wrong thing".
+
+When scope is confirmed, set the requirement gate:
+`update_metadata({ id, gates: { requirement: true }, state: "specifying" })`.
 
 ### Step 3 — Drive the phases (with specialist agents)
 
@@ -108,6 +118,18 @@ fields — batch them into one call to avoid metadata churn (e.g. 8+ edits to
 | Implementation | `task-implementer` agent | code + `implementation.md` | code review passes |
 | Review | `code-reviewer` agent | review notes in `implementation.md` | issues addressed |
 | Validation | `task-validator` agent | `validation.md` results | all checks + DoD pass |
+
+Within these phases, run four lightweight quality steps. They add **no new
+gates** — they strengthen the existing ones:
+
+- **Clarify** (Requirement) — resolve the top ambiguities before the requirement
+  gate (Step 2.5).
+- **Design & alternatives** (Plan) — for architecturally significant changes, the
+  planner records 2–3 options and the chosen approach in `plan.md`.
+- **Analyze** (Plan) — before the plan gate, confirm every acceptance criterion
+  maps to a plan step and vice-versa; fix gaps and rogue scope.
+- **Verify** (Implementation) — the implementer runs the `build-verify` skill and
+  iterates to green before the review gate.
 
 The specialist agents work for both flows: they read the requirement/spec doc
 (`spec.md` here) and the task state (`metadata.json` here) through the
@@ -171,5 +193,8 @@ When the user names an existing spec:
 - Keep `spec.md`, the phase docs, and `metadata.json` in sync with reality; they
   are living state. All reads/writes go through the `spec-workflow` MCP server.
 - One phase at a time; honor the gates and the agent separation of concerns.
+- All work must satisfy the engineering principles in
+  `chat/engineering-principles.instructions.md` (the constitution); the planner
+  and reviewer check plans and diffs against it.
 - This flow has **no CI**; use local Git and local validation.
 - Ask before creating branches, pushing, opening PRs, or deleting a spec.

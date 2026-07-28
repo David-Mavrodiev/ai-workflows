@@ -1,0 +1,50 @@
+#!/bin/sh
+# Repo guardrails — a deterministic gate that advisory instructions can't
+# guarantee. Enable with: pwsh -File scripts/setup-guardrails.ps1
+# (sets core.hooksPath -> .githooks). Override in a pinch with: git commit --no-verify
+#
+# Blocks a commit when it would:
+#   1. land directly on the default branch (main/master),
+#   2. include local memories/spec data (mcp/memories/memories-storage/**),
+#   3. add an obvious secret (AWS key, private key, Slack/GitHub token).
+set -u
+
+branch="$(git symbolic-ref --short HEAD 2>/dev/null || echo '')"
+block=0
+
+# 1. Never commit directly to the default branch.
+case "$branch" in
+  main|master)
+    echo "guard: refusing to commit directly to '$branch' — use a feature branch." >&2
+    block=1
+    ;;
+esac
+
+staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+# 2. Never commit local memories/spec data.
+mem="$(printf '%s\n' "$staged" | grep -E '^mcp/memories/memories-storage/' || true)"
+if [ -n "$mem" ]; then
+  echo "guard: refusing to commit local memories data:" >&2
+  printf '%s\n' "$mem" | sed 's/^/  /' >&2
+  block=1
+fi
+
+# 3. Obvious-secret scan on staged content.
+if [ -n "$staged" ]; then
+  secrets="$(git diff --cached -U0 --diff-filter=ACMR -- . ':(exclude).githooks/**' \
+    | grep -nE 'AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----|xox[baprs]-[0-9A-Za-z-]{10,}|gh[pousr]_[0-9A-Za-z]{20,}' \
+    || true)"
+  if [ -n "$secrets" ]; then
+    echo "guard: possible secret in staged changes:" >&2
+    printf '%s\n' "$secrets" | sed 's/^/  /' >&2
+    block=1
+  fi
+fi
+
+if [ "$block" -ne 0 ]; then
+  echo "" >&2
+  echo "Commit blocked by .githooks/pre-commit. Override (rarely): git commit --no-verify" >&2
+  exit 1
+fi
+exit 0

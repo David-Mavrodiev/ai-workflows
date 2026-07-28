@@ -65,6 +65,11 @@ present):
   split-pane-keep-cwd) but didn't.
 - **Long/stuck sessions** — high turn counts with the same file set (effort spent
   without converging).
+- **Context hygiene** — signals that context bloat is degrading results:
+  *kitchen-sink sessions* (one session touching many unrelated files, repos, or
+  topics) and *correction spirals* (the same file edited many times, or repeated
+  near-identical prompts in a row). Both are cues to recommend clearing context
+  between unrelated tasks and re-prompting fresh after two failed corrections.
 
 Keep it factual — base every observation on a query result, not a guess.
 

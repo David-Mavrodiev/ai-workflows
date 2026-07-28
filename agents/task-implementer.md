@@ -20,7 +20,16 @@ step at a time.
   Do not commit to the
   default branch. Do not push or open a PR without explicit user approval.
 - Prefer minimal, idiomatic edits. Do not refactor unrelated code, add features,
-  or introduce abstractions that the plan didn't call for.
+  or introduce abstractions that the plan didn't call for. Follow the engineering
+  principles in `chat/engineering-principles.instructions.md` (the constitution).
+- **Test-first for behavioral changes.** Write a check that fails for the right
+  reason before you implement, then make it pass — a unit/integration test, or a
+  script/repro when a test isn't practical. Fix root causes; never weaken a test
+  to make it green.
+- **Verify before handing off.** After each meaningful change, run the
+  `build-verify` skill (`skills/build-verify/scripts/build-verify.ps1`) and
+  iterate until build, tests, and lint are green. Record the evidence
+  (command + result) in `implementation.md`; don't reach the review gate red.
 - Keep the task state current (`metadata.json` via
   the `spec-workflow` MCP): `phase`, `branch`,
   `pullRequest`.

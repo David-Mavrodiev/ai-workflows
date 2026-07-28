@@ -16,7 +16,9 @@ on any new machine.
 | `chat/*.chatmode.md` | Custom chat modes / agents | VS Code Copilot |
 | `mcp/servers.json` | Canonical MCP server definitions | both (translated) |
 | `mcp/memories/` | Local-only memories MCP server + file-backed store | both |
-| `mcp/spec-workflow/` | Local-only, file-backed spec-driven task MCP server | both |
+| `mcp/spec-workflow/` | Local-only, brain-mcp-backed spec-driven task MCP server | both |
+| `chat/engineering-principles.instructions.md` | Engineering constitution (gates plans/reviews) | VS Code Copilot |
+| `.githooks/` | Git guardrail hooks (enable via `scripts/setup-guardrails.ps1`) | Git |
 | `.vscode/mcp.json` | Workspace MCP config for this repo | VS Code Copilot |
 | `AGENTS.md` | Repo-level agent instructions | both |
 | `install.ps1` | Idempotent installer | — |
@@ -51,6 +53,22 @@ live-editable from this repo — edit a file here and it takes effect after a re
 - **CLI agent** — add `agents/<name>.md`.
 - **VS Code prompt/instructions/mode** — add the matching `chat/*.{prompt,instructions,chatmode}.md` file.
 - **MCP server** — edit `mcp/servers.json` only, then re-run `install.ps1`.
+
+## Engineering guardrails
+
+Aids that make changes faster and safer:
+
+- **Constitution** — `chat/engineering-principles.instructions.md` holds durable
+  engineering principles (simplicity, proven correctness, design for change,
+  security, reversible scope). The `task-planner` and `code-reviewer` check plans
+  and diffs against it.
+- **`build-verify` skill** — a fast, ecosystem-detecting build/test/lint loop
+  (`skills/build-verify/`) the implementer runs to green before review.
+- **Git pre-commit guard** — enable once per clone with
+  `pwsh -File scripts/setup-guardrails.ps1`. It points `core.hooksPath` at
+  `.githooks/`, blocking direct commits to the default branch, commits of local
+  memories (`mcp/memories/memories-storage/`), and obvious secrets. Override in a
+  pinch with `git commit --no-verify`.
 
 ## Secrets
 
@@ -96,9 +114,10 @@ plan → implementation → review → validation using the specialist agents.
 Highlights:
 - **Interview → spec** — `get_spec_questions` returns a structured questionnaire;
   the agent asks in small batches and synthesizes your answers into `spec.md`.
-- **File-backed store** — each spec is a GUID folder with `metadata.json`,
-  `spec.md`, `plan.md`, `implementation.md`, and `validation.md`. No external
-  service or sign-in; it's all local.
+- **brain-mcp-backed store** — each spec is a set of linked notes (a metadata
+  note plus `spec.md`, `plan.md`, `implementation.md`, `validation.md`) in the
+  "Tasks & Specs" section of the local Memories app. No external service or
+  sign-in; it's all local.
 - **Dashboard / resume** — `metadata.json` tracks phase, gates, branch, and PR;
   ask for "status" to list specs or get a standup summary, and naming an existing
   spec resumes it.
@@ -107,8 +126,9 @@ Highlights:
 - **Local Git, no CI** — optional feature branch / PR via plain Git; validation
   runs locally.
 
-It's powered by a **local-only, file-backed MCP server** (`mcp/spec-workflow/`),
-registered automatically via `mcp/servers.json` (the `spec-workflow` entry) and
-built by the installer (`mcp/spec-workflow/mcp-server` → `build/index.js`). Specs
-are stored **outside this repo** under `~/specs` (`%USERPROFILE%\specs` on
-Windows) by default; set `SPECS_DIR` to override.
+It's powered by a **local-only MCP server** (`mcp/spec-workflow/`), registered
+automatically via `mcp/servers.json` (the `spec-workflow` entry) and built by the
+installer (`mcp/spec-workflow/mcp-server` → `build/index.js`). Specs are stored as
+linked notes in the **"Tasks & Specs"** section of the local Memories app
+(`brain-mcp`), so they live alongside your other memories — no separate spec
+store or sign-in.

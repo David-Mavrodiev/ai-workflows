@@ -18,8 +18,10 @@ anywhere. If `session_store_sql` is unavailable, tell me and stop.
 2. **Compute metrics.** Find friction and habits: turns per session/repo/agent;
    backtrack loops (same file edited many times in a session; repeated similar
    prompts); tool mix; recurring command sequences across sessions; skill
-   adoption (where a skill should have been used but wasn't); long/stuck sessions.
-   Base every observation on a query result.
+   adoption (where a skill should have been used but wasn't); long/stuck sessions;
+   context hygiene (kitchen-sink sessions touching many unrelated files/topics;
+   correction spirals) — cues to clear context and re-prompt fresh. Base every
+   observation on a query result.
 3. **Recall.** Search `brain-mcp` under the `flow-coach` topic for past
    suggestions — don't repeat declined advice; check what was adopted.
 4. **Report.** Show top friction, then a **Markdown table** of recommendations

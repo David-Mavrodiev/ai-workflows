@@ -54,6 +54,11 @@ on other systems/teams, and data/privacy/auth considerations.}}
 ## Approach
 {{1–3 sentence strategy}}
 
+## Design & alternatives
+{{For significant changes only (hard to reverse, cross-cutting, or changing a
+contract / data shape / dependency): 2–3 options considered, their tradeoffs, the
+option chosen, and why. Otherwise "N/A — small change".}}
+
 ## Steps
 1. {{ordered, concrete, verifiable step}}
 2. ...

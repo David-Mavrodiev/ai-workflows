@@ -35,14 +35,24 @@ summary. Always use the full GUID in tool calls.
    `save_spec`. When I confirm scope, set
    `update_metadata({ id, gates: { requirement: true }, state: "specifying" })`.
 3. **Drive the phases**, one at a time with my sign-off at each gate, persisting
-   each doc with `write_doc` and advancing `metadata.json` with `update_metadata`:
-   - **Requirement**: confirm scope & acceptance criteria in `spec.md`.
+   each doc with `write_doc` and advancing `metadata.json` with `update_metadata`.
+   All work must satisfy the constitution in
+   `chat/engineering-principles.instructions.md`:
+   - **Requirement**: confirm scope & acceptance criteria in `spec.md`. Before the
+     gate, run a short **clarify** pass on the hard, underspecified parts (2–3
+     pointed questions) and fold the answers back in.
    - **Plan**: ordered, verifiable steps; delegate codebase exploration to the
-     `Explore` subagent; write `plan.md`; set `phase: "plan"`, `state: "planned"`.
-   - **Implementation**: execute the plan; log each change in
-     `implementation.md`; `state: "implementing"`.
-   - **Review**: a focused code-review pass (correctness, scope, security/OWASP,
-     tests, conventions); record findings in `implementation.md`; address blockers;
+     `Explore` subagent; write `plan.md`; for significant changes record 2–3
+     options + the choice in a **Design & alternatives** section (an ADR). Before
+     the gate, **analyze** coverage: every acceptance criterion maps to a step and
+     back. Set `phase: "plan"`, `state: "planned"`.
+   - **Implementation**: execute the plan; write a failing test first for
+     behavioral changes; log each change in `implementation.md`; run the
+     `build-verify` skill and iterate to green before review; `state:
+     "implementing"`.
+   - **Review**: a focused, fresh-eyes code-review pass (correctness, scope,
+     security/OWASP, tests, conventions) judging the diff on its own terms; flag
+     gaps not style; record findings in `implementation.md`; address blockers;
      `state: "in-review"`.
    - **Validation**: build, run tests/linters **locally** (no CI); record real
      output and pass/fail per check + Definition of Done in `validation.md`; loop
