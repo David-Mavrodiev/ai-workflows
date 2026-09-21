@@ -200,9 +200,14 @@ $cliSettingsPath = Join-Path $copilotDir 'settings.json'
 $cliMcpPath      = Join-Path $copilotDir 'mcp-config.json'
 
 if (-not $VSCodeUserDir) {
-    if ($IsWindows -or $env:OS -match 'Windows') {
+    # $IsWindows / $IsMacOS are automatic variables in PowerShell 6+ only.
+    # Windows PowerShell 5.1 doesn't define them, and Set-StrictMode makes a
+    # bare reference throw, so probe for them via the variable: provider.
+    $onWindows = if (Test-Path variable:IsWindows) { $IsWindows } else { $true }
+    $onMac     = if (Test-Path variable:IsMacOS)   { $IsMacOS }   else { $false }
+    if ($onWindows -or $env:OS -match 'Windows') {
         $VSCodeUserDir = Join-Path $env:APPDATA 'Code\User'
-    } elseif ($IsMacOS) {
+    } elseif ($onMac) {
         $VSCodeUserDir = Join-Path $HOME 'Library/Application Support/Code/User'
     } else {
         $VSCodeUserDir = Join-Path $HOME '.config/Code/User'
@@ -459,7 +464,7 @@ if (Test-Path $mcpRoot) {
         Write-Step "Local MCP server: $serverName"
         $buildOutput = Join-Path $serverDir 'build/index.js'
         if (-not (Get-Command node -ErrorAction SilentlyContinue) -or -not (Get-Command npm -ErrorAction SilentlyContinue)) {
-            Write-Warn "Node.js/npm not found on PATH; skipping build. Install Node 18+ and re-run."
+            Write-Warn "Node.js/npm not found on PATH; skipping build. Install Node 22+ and re-run."
         } elseif (Test-Path $buildOutput) {
             Write-Skipped "$serverName MCP server already built ($relDir/build/index.js)"
         } elseif ($PSCmdlet.ShouldProcess($serverDir, "npm install && npm run build")) {
@@ -482,7 +487,7 @@ if (Test-Path $mcpRoot) {
         if ($serverName -eq 'memories') {
             Write-Info "Start the Memories app before use: mcp/memories/start-server.ps1 (listens on http://localhost:3466)."
         } elseif ($serverName -eq 'spec-workflow') {
-            Write-Info "Specs are stored under ~/specs by default; set SPECS_DIR to override."
+            Write-Info "Specs are stored in the Memories app under 'Tasks & Specs'."
         }
         Write-Host ""
     }

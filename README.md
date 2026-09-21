@@ -21,6 +21,7 @@ on any new machine.
 | `.githooks/` | Git guardrail hooks (enable via `scripts/setup-guardrails.ps1`) | Git |
 | `.vscode/mcp.json` | Workspace MCP config for this repo | VS Code Copilot |
 | `AGENTS.md` | Repo-level agent instructions | both |
+| `start.ps1` | Checks, installs, and starts all persistent local services | — |
 | `install.ps1` | Idempotent installer | — |
 
 ## Setup on a new devbox
@@ -29,10 +30,22 @@ on any new machine.
 git clone <this-repo> C:\work\personal-ai-workflows
 cd C:\work\personal-ai-workflows
 Copy-Item .env.example .env   # then fill in any secrets
-./install.ps1                 # add -WhatIf to preview changes
+.\start.ps1
 ```
 
 Then reload VS Code and restart the Copilot CLI.
+
+`start.ps1` requires Node.js 22+ and is safe to run repeatedly. It checks the
+required tools and Memories app dependencies, invokes the idempotent
+`install.ps1`, verifies that the local MCP servers are registered and built,
+then starts the Memories app in the background if it is not already healthy.
+It prints the process ID and temporary log paths for a newly started app.
+
+The MCP wrappers use stdio and belong to their client connection, so they are
+started on demand by VS Code or Copilot CLI rather than as independent
+background processes. To preview installer changes without starting anything,
+run `.\install.ps1 -WhatIf`. Stop the Memories app with
+`.\mcp\memories\stop-server.ps1`.
 
 ## What the installer changes
 

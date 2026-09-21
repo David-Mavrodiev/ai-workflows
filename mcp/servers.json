@@ -17,6 +17,13 @@
       "args": ["-y", "@modelcontextprotocol/server-sequentialthinking"],
       "targets": ["vscode", "cli"]
     },
+    "playwright": {
+      "kind": "stdio",
+      "_comment": "Microsoft Playwright MCP server for browser automation (navigate, click, type, screenshot, etc.). Runs via npx; first run downloads the package and may prompt to install browsers (npx playwright install).",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"],
+      "targets": ["vscode", "cli"]
+    },
     "github": {
       "kind": "http",
       "url": "https://api.githubcopilot.com/mcp/",

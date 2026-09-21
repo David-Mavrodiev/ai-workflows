@@ -32,7 +32,7 @@
 #>
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
-    [ValidateSet('WindowsTerminal')]
+    [ValidateSet('IntelligentTerminal','WindowsTerminal')]
     [string[]]$Apps
 )
 
@@ -44,6 +44,7 @@ function Write-Skip($t)    { Write-Host "  • $t" -ForegroundColor DarkGray }
 function Write-Warn2($t)   { Write-Host "  ! $t" -ForegroundColor Yellow }
 
 $Packages = [ordered]@{
+    IntelligentTerminal = 'Microsoft.IntelligentTerminal_8wekyb3d8bbwe'
     WindowsTerminal     = 'Microsoft.WindowsTerminal_8wekyb3d8bbwe'
 }
 
@@ -168,6 +169,12 @@ function Install-CmdShellIntegration {
     }
 
     $regPath  = 'HKCU:\Software\Microsoft\Command Processor'
+    if (-not (Test-Path -LiteralPath $regPath)) {
+        if ($PSCmdlet.ShouldProcess($regPath, 'Create registry key')) {
+            New-Item -Path $regPath -Force | Out-Null
+            Write-Ok "Created registry key $regPath"
+        }
+    }
     $existing = (Get-ItemProperty -Path $regPath -Name AutoRun -ErrorAction SilentlyContinue).AutoRun
     $quoted   = '"' + $targetPath + '"'
 

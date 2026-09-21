@@ -94,6 +94,7 @@ function Check-PowerShellIntegration {
     $found = $false
     foreach ($p in $profiles) {
         $t = Get-Content -Raw $p
+        if ($null -eq $t) { $t = '' }
         $hit = ($t -match '9;9') -or ($t -match 'shell-integration')
         if (-not $hit) {
             $matches = [regex]::Matches($t, '(?im)^\s*\.\s+["'']?([^"''`r`n]+)["'']?')

@@ -1,19 +1,19 @@
-# Memories App — Setup Script (Windows PowerShell)
+# Memories App - Setup Script (Windows PowerShell)
 # Installs all prerequisites for running the Memories application.
 #
 # Usage:
 #   .\setup.ps1
 #
-# This script is idempotent — safe to run multiple times.
+# This script is idempotent - safe to run multiple times.
 
 $ErrorActionPreference = "Continue"
 
-function Write-Info  { param($msg) Write-Host "✓ $msg" -ForegroundColor Green }
-function Write-Warn  { param($msg) Write-Host "⚠ $msg" -ForegroundColor Yellow }
-function Write-Err   { param($msg) Write-Host "✗ $msg" -ForegroundColor Red }
+function Write-Info  { param($msg) Write-Host "[OK] $msg" -ForegroundColor Green }
+function Write-Warn  { param($msg) Write-Host "[!] $msg" -ForegroundColor Yellow }
+function Write-Err   { param($msg) Write-Host "[X] $msg" -ForegroundColor Red }
 function Write-Header { param($msg) Write-Host "`n$msg" -ForegroundColor Cyan }
 
-Write-Header "Memories App — Setup"
+Write-Header "Memories App - Setup"
 Write-Host "This script installs prerequisites for the Memories application."
 Write-Host ""
 
@@ -77,7 +77,7 @@ if ($copilot) {
 }
 
 # --- Python (optional) ---
-Write-Header "Checking Python (optional — needed if building MCP server in Python)..."
+Write-Header "Checking Python (optional - needed if building MCP server in Python)..."
 $python = Get-Command python -ErrorAction SilentlyContinue
 if (-not $python) { $python = Get-Command python3 -ErrorAction SilentlyContinue }
 if ($python) {
@@ -94,7 +94,7 @@ $uv = Get-Command uv -ErrorAction SilentlyContinue
 if ($uv) {
     Write-Info "uv found"
 } else {
-    Write-Warn "uv not found (optional — useful for Python MCP development)"
+    Write-Warn "uv not found (optional - useful for Python MCP development)"
     Write-Host "  Install: powershell -ExecutionPolicy ByPass -c `"irm https://astral.sh/uv/install.ps1 | iex`""
 }
 
@@ -108,14 +108,14 @@ if (Test-Path $packageJson) {
     Write-Info "Dependencies installed"
     Pop-Location
 } else {
-    Write-Warn "No src\package.json found yet — run this again after the app is scaffolded"
+    Write-Warn "No src\package.json found yet - run this again after the app is scaffolded"
 }
 
 # --- Summary ---
 Write-Header "Setup Complete"
 Write-Host ""
 Write-Host "Next steps:"
-Write-Host "  1. cd src; npm start     — Start the Memories app"
-Write-Host "  2. copilot               — Launch Copilot CLI"
+Write-Host "  1. cd src; npm start     - Start the Memories app"
+Write-Host "  2. copilot               - Launch Copilot CLI"
 Write-Host "  3. Follow docs\MCP_LAB_GUIDE.md to build your MCP server"
 Write-Host ""
